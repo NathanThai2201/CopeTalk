@@ -1,1 +1,1 @@
-One way CBC 
+One way
