@@ -1,18 +1,21 @@
-import random
 ascii_low = 32
 ascii_high = 126
 def decrypt(landing_input):
+    input2 = cbb(landing_input)
+    return input2
+def cbb(landing_input):
     input2 = p(landing_input)
+    input2 = ec(input2)
     input2 = d(input2,0)
     input2.reverse()
-    input2 = v(input2,g(1000,seed=310673))
+    input2 = v(input2,g(200,seed=310673))
     input2 = d(input2,1)
     input2.reverse()
-    input2 = v(input2,g(1000,seed=569212))
-    input2 = v(input2,g(1000,seed=120562))
-    input2 = v(input2,g(1000,seed=198259))
-    input2 = v(input2,g(1000,seed=472810))
-    input2 = v(input2,g(1000,seed=331229))
+    input2 = v(input2,g(200,seed=569212))
+    input2 = v(input2,g(200,seed=120562))
+    input2 = v(input2,g(200,seed=198259))
+    input2 = v(input2,g(200,seed=472810))
+    input2 = v(input2,g(200,seed=331229))
     input2 = ps(input2)
     input2 = nc(input2,1)
     input2 = d(input2,0)
@@ -20,6 +23,7 @@ def decrypt(landing_input):
     input2 = f(input2)
     input2.reverse()
     input2 = r(input2)
+    input2 = ec(input2)
     input2 = d(input2,1)
 
     return input2
@@ -63,16 +67,9 @@ def e(t_input):
     return t_input
 def nc(t_input,index):
     amount=5
-    random.seed()
     if index == 1:
         return t_input[amount:len(t_input)-amount]
     if index == 0:
-        f = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-        for i in range(amount):
-            index2 = random.randint(0, len(f) - 1)
-            t_input.insert(0, f[index2]) 
-            index2 = random.randint(0, len(f) - 1)
-            t_input.append(f[index2])
         return t_input
 def ps(t_input):
     i = 0
@@ -112,12 +109,26 @@ def r(t_input):
     else:
         t_input.pop(0)
     return t_input
-def g(length, seed=None):
-    if seed is not None:
-        random.seed(seed)
-    characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    random_string = ''.join(random.choice(characters) for _ in range(length)) 
+def g(length, seed):
+    newstr = []
+    for a in range(length):
+        seed = str(seed)
+        characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~abcdefghijklmnop'
+        for i in range(0, 6, 2):
+            numstr = int(seed[i:i+2])
+            newstr.append(characters[numstr])
+        random_string = ''.join(map(str, newstr)) 
+        seed = int(seed)
+        seed = seed*4 + 184503 + (a*123) + (a%2)*468160 + (1-(a%2))*501764
     return random_string
+def ec(t_input):
+    if (len(t_input) % 2 == 0):
+        index = len(t_input)//2
+        one = t_input[:index]
+        two = t_input[index:]
+        final = two + one
+        return final
+    return t_input
 def main():
     with open("in.txt", 'r') as file:
         landing_input = file.read()
@@ -125,4 +136,5 @@ def main():
     result = decrypt(t_input)
     final = ''.join(map(str, result))
     print(final)
-main()
+if __name__ == "__main__":  
+    main()
